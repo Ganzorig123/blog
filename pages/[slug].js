@@ -1,6 +1,17 @@
 import { Row, Col } from "react-bootstrap";
 import Layout from "components/layout";
-import { getPostBySlug } from "lib/api";
+import { getAllPosts, getPostBySlug } from "lib/api";
+const BlockContent = require("@sanity/block-content-to-react");
+
+const serializers = {
+  types: {
+    code: (props) => (
+      <pre data-language={props.node.language}>
+        <code>{props.node.code}</code>
+      </pre>
+    ),
+  },
+};
 
 export default ({ post }) => {
   return (
@@ -30,31 +41,32 @@ export default ({ post }) => {
             <img className="img-fluid rounded" src={post.image} alt="" />
           </div>
           <br />
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
-          dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-          commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-          velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-          occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.
+          <BlockContent blocks={post.content} serializers={serializers} />
         </Col>
       </Row>
     </Layout>
   );
 };
 
-export const getServerSideProps = async ({ params }) => {
+export const getStaticProps = async ({ params }) => {
   const post = await getPostBySlug(params.slug);
   return {
     props: {
       post: post[0],
     },
+  };
+};
+
+export const getStaticPaths = async () => {
+  const posts = await getAllPosts();
+  const data = posts.map((post) => ({
+    params: {
+      slug: post.slug,
+    },
+  }));
+
+  return {
+    paths: data,
+    fallback: false,
   };
 };
