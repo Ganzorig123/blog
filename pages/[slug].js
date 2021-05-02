@@ -1,6 +1,6 @@
 import { Row, Col } from "react-bootstrap";
 import Layout from "components/layout";
-import { getAllPosts, getPostBySlug } from "lib/api";
+import { getPostBySlug } from "lib/api";
 
 export default ({ post }) => {
   return (
@@ -50,28 +50,11 @@ export default ({ post }) => {
   );
 };
 
-export const getStaticProps = async ({ params }) => {
-  console.log("==========getStaticProps", params.slug);
-
+export const getServerSideProps = async ({ params }) => {
   const post = await getPostBySlug(params.slug);
   return {
     props: {
       post: post[0],
     },
-  };
-};
-
-export const getStaticPaths = async () => {
-  const posts = await getAllPosts();
-
-  const data = posts.map((post) => ({
-    params: {
-      slug: post.slug,
-    },
-  }));
-
-  return {
-    paths: data,
-    fallback: false,
   };
 };
