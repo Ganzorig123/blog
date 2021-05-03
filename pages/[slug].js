@@ -1,14 +1,24 @@
 import { Row, Col } from "react-bootstrap";
 import Layout from "components/layout";
-import { getAllPosts, getPostBySlug } from "lib/api";
+import HighlightCode from "components/highlight-code";
+import { getAllPosts, getPostBySlug, urlFor } from "lib/api";
 const BlockContent = require("@sanity/block-content-to-react");
 
 const serializers = {
   types: {
     code: (props) => (
-      <pre data-language={props.node.language}>
-        <code>{props.node.code}</code>
-      </pre>
+      <HighlightCode language={props.node.language}>
+        {props.node.code}
+        <div className="code-filename">{props.node.filename}</div>
+      </HighlightCode>
+    ),
+    image: (props) => (
+      <div className={`blog-image blog-image-${props.node.position}`}>
+        <img src={urlFor(props.node.asset.url).width(500).url()} />
+        <div className="code-filename" style={{ textAlign: "center" }}>
+          {props.node.alt}
+        </div>
+      </div>
     ),
   },
 };
@@ -38,10 +48,21 @@ export default ({ post }) => {
               {post.subtitle}
             </h2>
 
-            <img className="img-fluid rounded" src={post.image} alt="" />
+            <img
+              className="img-fluid rounded"
+              src={urlFor(post.cover_image).width(400).url()}
+              alt={post.cover_image.alt}
+            />
+            <div className="code-filename" style={{ textAlign: "center" }}>
+              {post.cover_image.alt}
+            </div>
           </div>
           <br />
-          <BlockContent blocks={post.content} serializers={serializers} />
+          <BlockContent
+            blocks={post.content}
+            serializers={serializers}
+            imageOptions={{ w: 600, h: 400, fit: "max" }}
+          />
         </Col>
       </Row>
     </Layout>
