@@ -22,7 +22,8 @@ export default ({ post }) => {
             </Card.Title>
             <Card.Text className="card-date">
               {/* {moment(post.date).format("MMMM Do YY")} */}
-              {moment(post.date).startOf("day").fromNow()}
+              {moment(post.date).format("lll")}
+              {/* {moment(post.date).startOf("day").fromNow()} */}
             </Card.Text>
           </div>
         </Card.Header>
