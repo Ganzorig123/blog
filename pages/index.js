@@ -7,10 +7,11 @@ import Layout from "components/layout";
 import { getPagenatedPosts } from "lib/api";
 import { usePosts } from "hooks/use-posts";
 import { useSWRInfinite } from "swr";
+import PreviewAlert from "components/preview-alert";
 
 const PAGE_LIMIT = 3;
 
-export default function Home({ posts }) {
+export default function Home({ posts, preview }) {
   // const { data, isLoading, error } = usePosts(posts);
   const { data, size, setSize } = useSWRInfinite(
     (index) => `/api/posts?page=${index}&limit=${PAGE_LIMIT}`
@@ -28,6 +29,7 @@ export default function Home({ posts }) {
   return (
     <Layout>
       <Row>
+        {preview && <PreviewAlert />}
         <Col md="12">
           <Intro />
         </Col>
@@ -55,10 +57,10 @@ export default function Home({ posts }) {
 }
 
 //Static page анх Build хийх үед үүсэх json data
-export const getStaticProps = async () => {
+export const getStaticProps = async ({ preview = false }) => {
   const posts = await getPagenatedPosts(0, PAGE_LIMIT);
 
   return {
-    props: { posts },
+    props: { posts, preview },
   };
 };

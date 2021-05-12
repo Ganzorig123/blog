@@ -5,8 +5,9 @@ import Layout from "components/layout";
 import HighlightCode from "components/highlight-code";
 import PostHeader from "components/post-header";
 import { getAllPosts, getPagenatedPosts, getPostBySlug, urlFor } from "lib/api";
+import PreviewAlert from "components/preview-alert";
 
-export default ({ post }) => {
+export default ({ post, preview }) => {
   const router = useRouter();
 
   if (router.isFallback)
@@ -16,10 +17,18 @@ export default ({ post }) => {
       </Layout>
     );
 
+  if (!router.isFallback && !post?.slug)
+    return (
+      <Layout>
+        <div>уучлаарай ийм пост байхгүй байна.</div>
+      </Layout>
+    );
+
   return (
     <Layout>
       <Row>
         <Col md="12">
+          {preview && <PreviewAlert />}
           <pre>{/*JSON.stringify(post, null, 2)*/}</pre>
           <PostHeader post={post} />
           <br />
@@ -53,11 +62,12 @@ const serializers = {
   },
 };
 
-export const getStaticProps = async ({ params }) => {
-  const post = await getPostBySlug(params.slug);
+export const getStaticProps = async ({ params, preview = false }) => {
+  const post = await getPostBySlug(params.slug, preview);
   return {
     props: {
-      post: post[0],
+      post: post.length > 1 ? post[1] : post.length > 0 ? post[0] : {},
+      preview,
     },
   };
 };
