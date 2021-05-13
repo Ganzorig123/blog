@@ -2,8 +2,24 @@ import "react-toggle/style.css";
 import "styles/index.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "highlight.js/styles/agate.css";
+import "nprogress/nprogress.css";
 import { SWRConfig } from "swr";
 import { ThemeProvider } from "context/theme-context";
+import Router from "next/router";
+import NProgress from "nprogress";
+
+Router.onRouteChangeStart = (url) => {
+  console.log(url);
+  NProgress.start();
+};
+
+Router.onRouteChangeComplete = (url) => {
+  NProgress.done();
+};
+
+Router.onRouteChangeError = (url) => {
+  NProgress.done();
+};
 
 const fetcher = async (url) => {
   const res = await fetch(url);

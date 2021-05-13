@@ -13,8 +13,9 @@ const PAGE_LIMIT = 3;
 
 export default function Home({ posts, preview }) {
   // const { data, isLoading, error } = usePosts(posts);
-  const { data, size, setSize } = useSWRInfinite(
-    (index) => `/api/posts?page=${index}&limit=${PAGE_LIMIT}`
+  const { data, size, setSize, isValidating } = useSWRInfinite(
+    (index) => `/api/posts?page=${index}&limit=${PAGE_LIMIT}`,
+    { initialData: [posts] }
   );
 
   console.log("************", data);
@@ -38,19 +39,21 @@ export default function Home({ posts, preview }) {
       <hr />
       <pre>{/*JSON.stringify(data, null, 2)*/}</pre>
       <Row className="mb-5">
-        {data &&
-          data.map((page) =>
-            page.map((post) => (
-              <Col md={12 / PAGE_LIMIT}>
-                <GridItem post={post} />
-              </Col>
-            ))
-          )}
+        {data.map((page) =>
+          page.map((post) => (
+            <Col md={12 / PAGE_LIMIT}>
+              <GridItem post={post} />
+            </Col>
+          ))
+        )}
       </Row>
       <div style={{ textAlign: "center" }}>
-        {data && data[data.length - 1].length === PAGE_LIMIT && (
-          <Button onClick={() => setSize(size + 1)}>Цааш нь</Button>
-        )}
+        {data[data.length - 1].length === PAGE_LIMIT &&
+          (isValidating ? (
+            <div style={{ fontSize: 14 }}>Түр хүлээнэ үү...</div>
+          ) : (
+            <Button onClick={() => setSize(size + 1)}>Цааш нь үзэх ...</Button>
+          ))}
       </div>
     </Layout>
   );
@@ -62,5 +65,6 @@ export const getStaticProps = async ({ preview = false }) => {
 
   return {
     props: { posts, preview },
+    revalidate: 10,
   };
 };
